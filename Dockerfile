@@ -6,13 +6,13 @@ WORKDIR /app
 
 # Copiar archivos necesarios
 COPY requirements.txt .
-COPY app.py .
+COPY . .
 
 # Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Exponer puerto
-EXPOSE 5000
+EXPOSE 8080
 
 # Comando para iniciar la aplicación
-CMD ["python", "app.py"]
+CMD ["python", "src/app.py"]
