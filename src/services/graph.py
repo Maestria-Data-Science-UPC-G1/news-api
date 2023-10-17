@@ -3,9 +3,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from entities.schemas import Link, Node
 
-def generate_graph():
-    return jsonify({'message': 'AUA'})
-
 def generate_similarity_pairs(dataframe):
     vectorizer = CountVectorizer(binary=True)
     X = vectorizer.fit_transform(dataframe['title'])
@@ -28,7 +25,6 @@ def generate_similarity_pairs(dataframe):
                 nodes.append(node1.__dict__())
                 nodes.append(node2.__dict__())
                 
-                #link = Link(dataframe.loc[i, 'id'], dataframe.loc[j, 'id'], jaccard_sim[i, j])
                 link = Link(i, j, jaccard_sim[i, j])
                 links.append(link.__dict__())
                 similar_pairs.append((dataframe.loc[i, 'title'], dataframe.loc[j, 'title'], jaccard_sim[i, j], i, j))

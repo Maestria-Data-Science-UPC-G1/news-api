@@ -13,6 +13,14 @@ def generate_graph(query):
     api_url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}&from=2023-10-07&to=2023-10-14&language=en&sortBy=popularity"
     response = requests.get(api_url)
 
+    
+    totalResults = response.json()['totalResults']
+
+    if totalResults == 0:
+        return jsonify({"data": {"nodes": [], "links": []}})
+
+    print(f"totalResults: {totalResults}")
+
     df_articles = pd.DataFrame(response.json()['articles'])
     df_articles[['source_id', 'source_name']] = df_articles['source'].apply(extract_source_data).apply(pd.Series)
     df_articles = df_articles.drop('source', axis=1)
