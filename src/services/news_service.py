@@ -35,6 +35,9 @@ def generate_graph(query):
     df_resultados = df_resultados.reset_index(drop=True)
     print(f"Se encontraron {len(df_resultados)} articulos")
 
+    if len(df_resultados) == 0:
+        return jsonify({"data": {"nodes": [], "links": []}})
+
     links, nodes = graph.generate_similarity_pairs(df_resultados)
 
     data = {
