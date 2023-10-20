@@ -18,6 +18,7 @@ data_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src
 # Leer el archivo CSV en un dataframe
 print(f"Reading CSV file from {data_folder}")
 df = pd.read_csv(os.path.join(data_folder, 'news.csv'), sep='|')
+df.fillna('', inplace=True)
 print("CSV file readed successfully")
 
 def page_not_found(error):

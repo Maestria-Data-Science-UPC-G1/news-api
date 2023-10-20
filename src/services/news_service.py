@@ -9,6 +9,8 @@ def generate_graph(query):
     
     if query == "":
         return jsonify({"data": {"nodes": [], "links": []}})
+
+    api_key = os.getenv('API_KEY')#'d53adf8af18a46b09393a3074acf2dcc'
     '''
     api_key = os.getenv('API_KEY')#'d53adf8af18a46b09393a3074acf2dcc'
 
@@ -36,7 +38,23 @@ def generate_graph(query):
     print(f"Se encontraron {len(df_resultados)} articulos")
 
     if len(df_resultados) == 0:
-        return jsonify({"data": {"nodes": [], "links": []}})
+        print("Se busca en el API de noticias")
+        # Si no hay resultados del dataset local, va a buscar al API de noticias
+        api_url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}&from=2023-10-07&to=2023-10-14&language=en&sortBy=popularity"
+        response = requests.get(api_url)
+
+        total_results = response.json()['totalResults']
+
+        if total_results == 0:
+            return jsonify({"data": {"nodes": [], "links": []}})
+
+        print(f"totalResults: {total_results}")
+
+        df_resultados = pd.DataFrame(response.json()['articles'])
+        df_resultados[['source_id', 'source_name']] = df_resultados['source'].apply(extract_source_data).apply(pd.Series)
+        df_resultados = df_resultados.drop('source', axis=1)
+        
+        #return jsonify({"data": {"nodes": [], "links": []}})
 
     links, nodes = graph.generate_similarity_pairs(df_resultados)
 
