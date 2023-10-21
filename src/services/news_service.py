@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from flask import jsonify
 from app import df
+from entities.schemas import Link, Node
 
 def generate_graph(query):
     
@@ -56,12 +57,22 @@ def generate_graph(query):
         
         #return jsonify({"data": {"nodes": [], "links": []}})
 
-    links, nodes = graph.generate_similarity_pairs(df_resultados)
+    nodes, links, links_json = graph.generate_similarity_pairs(df_resultados)
+
+
+    ranks = graph.get_pagerank(links)
+    print(f"Cantidad de Ranks: {len(ranks)}")
+    print(f"Cantidad de Nodos: {len(nodes)}")
+
+    sorted_nodes = sorted(nodes, key=lambda x: ranks[x[0]], reverse=True)
+    nodes_json = [Node(*tupla).__dict__() for tupla in sorted_nodes]
+
+    #print(f"Nodes: {sorted_nodes}")
 
     data = {
         "data": {
-            "nodes": nodes,
-            "links": links
+            "nodes": nodes_json,
+            "links": links_json
         }
     }
 
