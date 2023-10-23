@@ -5,6 +5,7 @@ import os
 from flask import jsonify
 from app import df
 from entities.schemas import Link, Node
+import re
 
 def generate_graph(query):
     
@@ -31,9 +32,10 @@ def generate_graph(query):
     df_articles = df_articles.drop('source', axis=1)
     '''
     print(f"Iniciando busqueda con un dataframe total de {len(df)} articulos")
-    df_resultados = df[df['title'].str.contains(query, case=False) | 
-               df['description'].str.contains(query, case=False) | 
-               df['content'].str.contains(query, case=False)]
+    pattern = r"\b{}\b".format(re.escape(query))
+    df_resultados = df[df['title'].str.contains(pattern, case=False) | 
+               df['description'].str.contains(pattern, case=False) | 
+               df['content'].str.contains(pattern, case=False)]
     
     df_resultados = df_resultados.reset_index(drop=True)
     print(f"Se encontraron {len(df_resultados)} articulos")
