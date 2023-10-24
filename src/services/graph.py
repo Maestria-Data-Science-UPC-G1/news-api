@@ -1,14 +1,15 @@
 from flask import jsonify
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from entities.schemas import Link, Node
+from entities.schemas import Link
 import networkx as nx
+import os
 
 def generate_similarity_pairs(dataframe):
     vectorizer = CountVectorizer(binary=True)
     X = vectorizer.fit_transform(dataframe['title'])
 
-    umbral = 0.37
+    threshold = float(os.getenv('SIMILARITY_THRESHOLD'))
 
     # Calcular la similitud de Jaccard
     jaccard_sim = cosine_similarity(X)
@@ -21,7 +22,7 @@ def generate_similarity_pairs(dataframe):
     nodes = []
     for i in range(len(dataframe)):
         for j in range(i + 1, len(dataframe)):
-            if jaccard_sim[i, j] >= umbral:
+            if jaccard_sim[i, j] >= threshold:
                 #node1 = Node(i, dataframe.loc[i, 'title'], dataframe.loc[i, 'content'], dataframe.loc[i, 'url'], dataframe.loc[i, 'author'], dataframe.loc[i, 'description'], dataframe.loc[i, 'publishedAt'], dataframe.loc[i, 'source_name'])
                 #node2 = Node(j, dataframe.loc[j, 'title'], dataframe.loc[j, 'content'], dataframe.loc[j, 'url'], dataframe.loc[j, 'author'], dataframe.loc[j, 'description'], dataframe.loc[j, 'publishedAt'], dataframe.loc[j, 'source_name'])
                 #nodes.append(node1.__dict__())
@@ -29,8 +30,8 @@ def generate_similarity_pairs(dataframe):
                 link = Link(i, j, jaccard_sim[i, j])
                 links_json.append(link.__dict__())
                 links.append((i, j))
-                nodes.append((i, dataframe.loc[i, 'title'], dataframe.loc[i, 'content'], dataframe.loc[i, 'url'], dataframe.loc[i, 'author'], dataframe.loc[i, 'description'], dataframe.loc[i, 'publishedAt'], dataframe.loc[i, 'source_name']))
-                nodes.append((j, dataframe.loc[j, 'title'], dataframe.loc[j, 'content'], dataframe.loc[j, 'url'], dataframe.loc[j, 'author'], dataframe.loc[j, 'description'], dataframe.loc[j, 'publishedAt'], dataframe.loc[j, 'source_name']))
+                nodes.append((i, dataframe.loc[i, 'title'], dataframe.loc[i, 'content'], dataframe.loc[i, 'url'], dataframe.loc[i, 'author'], dataframe.loc[i, 'description'], dataframe.loc[i, 'publishedAt'], dataframe.loc[i, 'source_name'], dataframe.loc[i, 'sentiment']))
+                nodes.append((j, dataframe.loc[j, 'title'], dataframe.loc[j, 'content'], dataframe.loc[j, 'url'], dataframe.loc[j, 'author'], dataframe.loc[j, 'description'], dataframe.loc[j, 'publishedAt'], dataframe.loc[j, 'source_name'], dataframe.loc[j, 'sentiment']))
                 similar_pairs.append((dataframe.loc[i, 'title'], dataframe.loc[j, 'title'], jaccard_sim[i, j], i, j))
 
     print(f"Nodos antes del corte: {len(nodes)}")

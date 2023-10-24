@@ -12,7 +12,7 @@ class Link:
         }
 
 class Node:
-    def __init__(self, id, title, content, url, author, description, published_at, group):
+    def __init__(self, id, title, content, url, author, description, published_at, group, sentiment):
         self.id = id
         self.title = title
         self.content = content
@@ -21,6 +21,7 @@ class Node:
         self.description = description
         self.published_at = published_at
         self.group = group
+        self.sentiment = sentiment
 
     def __dict__(self):
         return {
@@ -31,5 +32,6 @@ class Node:
             'author': self.author,
             'description': self.description,
             'published_at': self.published_at,
-            'group': self.group
+            'group': self.group,
+            'sentiment': self.sentiment
         }
