@@ -35,3 +35,14 @@ class Node:
             'group': self.group,
             'sentiment': self.sentiment
         }
+    
+class SimilarNode:
+    def __init__(self, id, url):
+        self.id = id
+        self.url = url
+
+    def __dict__(self):
+        return {
+            'id': self.id,
+            'url': self.url
+        }

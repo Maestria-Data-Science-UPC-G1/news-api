@@ -4,11 +4,14 @@ import pandas as pd
 import os
 from flask import jsonify
 from app import df
-from entities.schemas import Link, Node
+from entities.schemas import SimilarNode, Node
 import re
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def generate_graph(query):
-    
+
     if query == "":
         return jsonify({"data": {"nodes": [], "links": []}})
 
@@ -41,26 +44,9 @@ def generate_graph(query):
     print(f"Se encontraron {len(df_resultados)} articulos")
 
     if len(df_resultados) == 0:
-        print("Se busca en el API de noticias")
-        # Si no hay resultados del dataset local, va a buscar al API de noticias
-        api_url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}&from=2023-10-07&to=2023-10-14&language=en&sortBy=popularity"
-        response = requests.get(api_url)
+        return jsonify({"data": {"nodes": [], "links": []}})
 
-        total_results = response.json()['totalResults']
-
-        if total_results == 0:
-            return jsonify({"data": {"nodes": [], "links": []}})
-
-        print(f"totalResults: {total_results}")
-
-        df_resultados = pd.DataFrame(response.json()['articles'])
-        df_resultados[['source_id', 'source_name']] = df_resultados['source'].apply(extract_source_data).apply(pd.Series)
-        df_resultados = df_resultados.drop('source', axis=1)
-        
-        #return jsonify({"data": {"nodes": [], "links": []}})
-
-    nodes, links, links_json = graph.generate_similarity_pairs(df_resultados)
-
+    nodes, links, links_json, similar_nodes = graph.generate_similarity_pairs(df_resultados)
 
     ranks = graph.get_pagerank(links)
     print(f"Cantidad de Ranks: {len(ranks)}")
@@ -69,8 +55,12 @@ def generate_graph(query):
     sorted_nodes = sorted(nodes, key=lambda x: ranks[x[0]], reverse=True)
     nodes_json = [Node(*tupla).__dict__() for tupla in sorted_nodes]
 
+    for node in nodes_json:
+        node_id = node['id']
+        if node_id in similar_nodes:
+            nodes = [SimilarNode(*similar).__dict__() for similar in similar_nodes[node_id]]
+            node['similar'] = nodes
     #print(f"Nodes: {sorted_nodes}")
-
     data = {
         "data": {
             "nodes": nodes_json,

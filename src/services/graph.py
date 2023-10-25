@@ -20,6 +20,7 @@ def generate_similarity_pairs(dataframe):
     #nodes = []
     links= []
     nodes = []
+    similar_nodes = {}
     for i in range(len(dataframe)):
         for j in range(i + 1, len(dataframe)):
             if jaccard_sim[i, j] >= threshold:
@@ -34,6 +35,21 @@ def generate_similarity_pairs(dataframe):
                 nodes.append((j, dataframe.loc[j, 'title'], dataframe.loc[j, 'content'], dataframe.loc[j, 'url'], dataframe.loc[j, 'author'], dataframe.loc[j, 'description'], dataframe.loc[j, 'publishedAt'], dataframe.loc[j, 'source_name'], dataframe.loc[j, 'sentiment']))
                 similar_pairs.append((dataframe.loc[i, 'title'], dataframe.loc[j, 'title'], jaccard_sim[i, j], i, j))
 
+                # Nodos similares
+                # Para el nodo i
+                if i in similar_nodes:
+                    similar_nodes[i].add((j, dataframe.loc[j, 'url']))
+                else:
+                    similar_nodes[i] = set()
+                    similar_nodes[i].add((j, dataframe.loc[j, 'url']))
+
+                # Para el nodo j
+                if j in similar_nodes:
+                    similar_nodes[j].add((i, dataframe.loc[i, 'url']))
+                else:
+                    similar_nodes[j] = set()
+                    similar_nodes[j].add((i, dataframe.loc[i, 'url']))
+
     print(f"Nodos antes del corte: {len(nodes)}")
     #nodes = list({node['id']: node for node in nodes}.values())
     # lo mismo que hice para nodes quiero hacerlo para nodes2
@@ -41,7 +57,7 @@ def generate_similarity_pairs(dataframe):
     print(f"Nodos despues del corte: {len(nodes)}")
     print(f"Links : {len(links)}")
 
-    return nodes, links, links_json
+    return nodes, links, links_json, similar_nodes
 
 # pagerank
 def get_pagerank(links):
