@@ -36,9 +36,7 @@ def generate_graph(query):
     '''
     print(f"Iniciando busqueda con un dataframe total de {len(df)} articulos")
     pattern = r"\b{}\b".format(re.escape(query))
-    df_resultados = df[df['title'].str.contains(pattern, case=False) | 
-               df['description'].str.contains(pattern, case=False) | 
-               df['content'].str.contains(pattern, case=False)]
+    df_resultados = df[df['text'].str.contains(pattern, case=False)]
     
     df_resultados = df_resultados.reset_index(drop=True)
     print(f"Se encontraron {len(df_resultados)} articulos")

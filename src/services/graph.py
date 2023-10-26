@@ -51,8 +51,6 @@ def generate_similarity_pairs(dataframe):
                     similar_nodes[j].add((i, dataframe.loc[i, 'url']))
 
     print(f"Nodos antes del corte: {len(nodes)}")
-    #nodes = list({node['id']: node for node in nodes}.values())
-    # lo mismo que hice para nodes quiero hacerlo para nodes2
     nodes = list({node[0]: node for node in nodes}.values())
     print(f"Nodos despues del corte: {len(nodes)}")
     print(f"Links : {len(links)}")
@@ -66,7 +64,7 @@ def get_pagerank(links):
     g.add_edges_from(links)
 
     pagerank = nx.pagerank(g) # calcular el pagerank de todos los nodos
-    ranks = [(k,v) for k,v in sorted(pagerank.items(), key=lambda item:-item[1])]
-    print(f"ranks: {ranks}")
+    #ranks = [(k,v) for k,v in sorted(pagerank.items(), key=lambda item:-item[1])]
+    #print(f"ranks: {ranks}")
     
     return pagerank
